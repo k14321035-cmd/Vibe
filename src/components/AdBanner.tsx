@@ -39,6 +39,14 @@ export default function AdBanner({ size = 'medium', className = '' }: AdBannerPr
         // AdSense not yet loaded
       }
     }
+
+    // Cleanup for web AdSense
+    return () => {
+      if (adRef.current) {
+        adRef.current.innerHTML = ''; // clear the injected iframe
+        adRef.current.removeAttribute('data-ad-status'); // reset status so it can reload if navigated back
+      }
+    };
   }, []);
 
   if (isNative) {
