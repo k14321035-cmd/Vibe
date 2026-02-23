@@ -2,11 +2,11 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY backend/package*.json ./
+COPY package*.json ./
 RUN npm install --production=false
 
-COPY backend/src ./src
-COPY backend/tsconfig.json ./
+COPY src ./src
+COPY tsconfig.json ./
 
 EXPOSE 3001
 
