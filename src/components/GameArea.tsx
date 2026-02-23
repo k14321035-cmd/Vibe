@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { GameType, QuizQuestion, User } from '../types';
 import { getSocket } from '../lib/socket';
 import { Sparkles, CheckCircle, XCircle, RefreshCw, Zap, Flame, Gift } from 'lucide-react';
-import AdRewarded from './AdRewarded';
 
 interface PlayerAnswer {
   userId: string;
@@ -39,8 +38,6 @@ const GameArea: React.FC<GameAreaProps> = ({ gameType, currentUser, onGameEnd })
   const [streak, setStreak] = useState(0);
   const [showStreak, setShowStreak] = useState(false);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
-  const [showRewardedAd, setShowRewardedAd] = useState(false);
-  const [rewardToast, setRewardToast] = useState(false);
 
   const socket = getSocket();
 
@@ -134,26 +131,6 @@ const GameArea: React.FC<GameAreaProps> = ({ gameType, currentUser, onGameEnd })
 
   return (
     <div className="min-h-full flex flex-col bg-gradient-to-br from-indigo-900/80 to-purple-900/80 rounded-xl border border-white/10 relative overflow-hidden">
-
-      {/* Rewarded Ad modal */}
-      {showRewardedAd && (
-        <AdRewarded
-          rewardLabel="🌟 Bonus Points x2"
-          onClose={() => setShowRewardedAd(false)}
-          onReward={() => {
-            setScore(s => s + 200);
-            setRewardToast(true);
-            setTimeout(() => setRewardToast(false), 3000);
-          }}
-        />
-      )}
-
-      {/* Reward toast */}
-      {rewardToast && (
-        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-30 bg-green-500 text-white font-black text-sm px-5 py-2.5 rounded-full shadow-xl flex items-center gap-2 animate-bounce pointer-events-none">
-          🎁 +200 Bonus Points!
-        </div>
-      )}
 
       {/* Streak popup */}
       {showStreak && (
@@ -315,13 +292,6 @@ const GameArea: React.FC<GameAreaProps> = ({ gameType, currentUser, onGameEnd })
         {gameType === GameType.QUIZ && (
           <span className="text-[10px] text-gray-500 self-center">{questionsAnswered} answered</span>
         )}
-        {/* Rewarded Ad button */}
-        <button
-          onClick={() => setShowRewardedAd(true)}
-          className="flex items-center gap-1.5 text-[10px] text-yellow-400 hover:text-yellow-300 font-bold bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 px-3 py-1.5 rounded-full transition-all"
-        >
-          <Gift size={12} /> Watch Ad for Bonus
-        </button>
         <button
           onClick={onGameEnd}
           className="text-[10px] text-gray-500 hover:text-white transition-colors underline self-center"
