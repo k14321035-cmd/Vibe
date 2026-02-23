@@ -169,7 +169,12 @@ export default function RoomPage() {
 
     const onUserLeft = (data: any) => {
       setParticipants(data.onlineUsers);
-      setMessages(prev => [...prev, data.message]);
+      if (data.message) {
+        setMessages(prev => [...prev, data.message]);
+      }
+      if (data.hostId) {
+        setRoom(prev => prev ? { ...prev, hostId: data.hostId } : prev);
+      }
       webrtcService.closePeerConnection(data.userId);
       setRemoteStreams(prev => {
         const next = new Map(prev);
