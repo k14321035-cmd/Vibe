@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-key-change-this-in-production}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+    volumes:
+      - ./backend/src:/app/src
+    command: npm run dev
+    networks:
+      - vibezone-network
+
+  # Frontend Development Server
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:3001}
+      VITE_GEMINI_API_KEY: ${VITE_GEMINI_API_KEY}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - vibezone-network
+    depends_on:
+      - backend
+
+networks:
+  vibezone-network:
+    driver: bridge

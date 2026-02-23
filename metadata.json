@@ -1,0 +1,8 @@
+{
+  "name": "VibeZone",
+  "description": "A teen-friendly social gaming platform to hang out, chat, and play games in real-time.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
