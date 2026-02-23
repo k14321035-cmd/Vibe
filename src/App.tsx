@@ -5,12 +5,8 @@ import LoginPage from './pages/LoginPage';
 import LobbyPage from './pages/LobbyPage';
 import RoomPage from './pages/RoomPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import { initAdMob } from './lib/admob';
 
 export default function App() {
-  useEffect(() => {
-    initAdMob();
-  }, []);
 
   return (
     <Router>
