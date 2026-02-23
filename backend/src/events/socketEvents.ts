@@ -115,6 +115,7 @@ export function setupSocketEvents(io: SocketIOServer) {
             username: socket.user.username,
             message: systemMessage,
             onlineUsers: room.participants,
+            hostId: room.hostId, // Broadcast new host
           });
         }
       }
@@ -358,10 +359,20 @@ export function setupSocketEvents(io: SocketIOServer) {
             await roomService.deleteRoom(socket.roomId);
             io.emit('room-deleted', { roomId: socket.roomId });
           } else {
+            const systemMessage = await roomService.addMessageToRoom(
+              socket.roomId,
+              'system',
+              'System',
+              `${socket.user.username} disconnected`,
+              true
+            );
+
             io.to(`room:${socket.roomId}`).emit('user-left', {
               userId: socket.userId,
               username: socket.user.username,
+              message: systemMessage,
               onlineUsers: room.participants,
+              hostId: room.hostId, // Broadcast new host
             });
           }
         }
