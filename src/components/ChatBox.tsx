@@ -44,7 +44,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ messages, currentUser, onSendMessage 
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-4 scrollbar-hide">
-        {messages.map((msg) => {
+        {messages.filter(Boolean).map((msg) => {
           const isMe = msg.userId === currentUser.id;
           if (msg.isSystem) {
              return (
