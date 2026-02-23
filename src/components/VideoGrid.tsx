@@ -97,6 +97,12 @@ const VideoGrid: React.FC<VideoGridProps> = ({ participants, currentUser, localS
   const hostUser = displayUsers.find(u => u.isHost);
   const otherUsers = displayUsers.filter(u => !u.isHost);
 
+  // Check if any non-host user is actively sharing video
+  const anyOtherSharingVideo = otherUsers.some(user => {
+      const stream = user.id === currentUser.id ? localStream : remoteStreams?.get(user.id);
+      return stream && stream.getVideoTracks().length > 0;
+  });
+
   // Fallback if no host is found
   if (!hostUser) {
     return (
@@ -114,11 +120,11 @@ const VideoGrid: React.FC<VideoGridProps> = ({ participants, currentUser, localS
     );
   }
 
-  // Host takes a prominent section, others fill the grid below
+  // Host takes a prominent section (100% if no one else is sharing video, 50% if others are sharing )
   return (
     <div className="flex flex-col h-full overflow-hidden p-4 pb-20 md:pb-4 gap-3">
       {/* Host Section */}
-      <div className={`${otherUsers.length > 0 ? "h-1/3 md:h-2/5 shrink-0" : "flex-1"}`}>
+      <div className={`${anyOtherSharingVideo ? "h-1/2 shrink-0" : "flex-1 shrink-0"} transition-all duration-300`}>
         <VideoTile
            key={hostUser.id}
            user={hostUser}
