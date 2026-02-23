@@ -14,9 +14,10 @@ interface VideoTileProps {
     stream: MediaStream | null;
     isLocal?: boolean;
     isHost?: boolean;
+    className?: string;
 }
 
-const VideoTile: React.FC<VideoTileProps> = ({ user, stream, isLocal, isHost }) => {
+const VideoTile: React.FC<VideoTileProps> = ({ user, stream, isLocal, isHost, className }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
@@ -41,7 +42,7 @@ const VideoTile: React.FC<VideoTileProps> = ({ user, stream, isLocal, isHost }) 
         : !!(user.canSpeak || isHost);
 
     return (
-        <div className="relative aspect-video bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-white/10 group">
+        <div className={`relative bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-white/10 group ${className || 'aspect-video'}`}>
 
             {/* Always keep <video> in the DOM so srcObject is always attached.
                 Hide via CSS when no video track — avoids black screen from conditional mount. */}
@@ -93,17 +94,61 @@ const VideoGrid: React.FC<VideoGridProps> = ({ participants, currentUser, localS
   
   const displayUsers = [effectiveCurrentUser, ...participants.filter(p => p.id !== currentUser.id)];
 
+  const hostUser = displayUsers.find(u => u.isHost);
+  const otherUsers = displayUsers.filter(u => !u.isHost);
+
+  // Fallback if no host is found
+  if (!hostUser) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 pb-20 md:pb-4 auto-rows-max content-start overflow-y-auto h-full scrollbar-hide">
+        {displayUsers.map((user) => (
+          <VideoTile 
+              key={user.id}
+              user={user}
+              stream={user.id === currentUser.id ? localStream : (remoteStreams?.get(user.id) || null)}
+              isLocal={user.id === currentUser.id}
+              isHost={user.isHost}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // Host takes a prominent section, others fill the grid below
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 pb-20 md:pb-4 auto-rows-max content-start overflow-y-auto h-full scrollbar-hide">
-      {displayUsers.map((user) => (
-        <VideoTile 
-            key={user.id}
-            user={user}
-            stream={user.id === currentUser.id ? localStream : (remoteStreams?.get(user.id) || null)}
-            isLocal={user.id === currentUser.id}
-            isHost={user.isHost}
+    <div className="flex flex-col h-full overflow-hidden p-4 pb-20 md:pb-4 gap-3">
+      {/* Host Section */}
+      <div className={`${otherUsers.length > 0 ? "h-1/3 md:h-2/5 shrink-0" : "flex-1"}`}>
+        <VideoTile
+           key={hostUser.id}
+           user={hostUser}
+           stream={hostUser.id === currentUser.id ? localStream : (remoteStreams?.get(hostUser.id) || null)}
+           isLocal={hostUser.id === currentUser.id}
+           isHost={true}
+           className="w-full h-full"
         />
-      ))}
+      </div>
+
+      {/* Others Section */}
+      {otherUsers.length > 0 && (
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
+          <div className={`grid gap-3 auto-rows-max ${
+              otherUsers.length === 1 ? 'grid-cols-1' :
+              otherUsers.length === 2 ? 'grid-cols-2' :
+              'grid-cols-2 md:grid-cols-3'
+          }`}>
+            {otherUsers.map((user) => (
+              <VideoTile 
+                  key={user.id}
+                  user={user}
+                  stream={user.id === currentUser.id ? localStream : (remoteStreams?.get(user.id) || null)}
+                  isLocal={user.id === currentUser.id}
+                  isHost={false}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
