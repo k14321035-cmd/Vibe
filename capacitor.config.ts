@@ -3,9 +3,10 @@ const config: CapacitorConfig = {
   appId: 'com.vibezone.app',
   appName: 'VibeZone',
   webDir: 'dist',
-  android: { allowMixedContent: true },
-  plugins: {
-    AdMob: { appId: 'ca-app-pub-3806916534802053~6014490684' }
-  }
+  server: {
+    url: 'https://vibezon-frontend.onrender.com',
+    cleartext: true
+  },
+  android: { allowMixedContent: true }
 };
 export default config;
