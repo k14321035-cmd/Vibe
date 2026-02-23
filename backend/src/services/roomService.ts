@@ -118,13 +118,22 @@ export const roomService = {
   async removeUserFromRoom(roomId: string, userId: string): Promise<any | null> {
     if (!isValidId(roomId) || !isValidId(userId)) return null;
     try {
-      const room = await Room.findByIdAndUpdate(
+      const room: any = await Room.findByIdAndUpdate(
         roomId,
         { $pull: { participants: userId } },
         { new: true }
       ).populate('participants').lean();
       
-      return room ? mapRoom(room) : null;
+      if (!room) return null;
+
+      // Reassign host if the host left and there are still participants
+      if (room.hostId.toString() === userId && room.participants && room.participants.length > 0) {
+        const newHostId = room.participants[0]._id?.toString() || room.participants[0].id?.toString() || room.participants[0].toString();
+        await Room.findByIdAndUpdate(roomId, { hostId: newHostId });
+        room.hostId = newHostId;
+      }
+
+      return mapRoom(room);
     } catch (error) {
       console.error(`[RoomService] Error removing user from room ${roomId}:`, error);
       return null;
