@@ -5,9 +5,6 @@ import { api } from '../lib/api';
 import { getSocket } from '../lib/socket';
 import { Plus, Video, LogOut, UserCircle, Loader } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
-import AdBanner from '../components/AdBanner';
-import AdNative from '../components/AdNative';
-import AdInterstitial from '../components/AdInterstitial';
 
 interface RoomInfo {
   id: string;
@@ -33,8 +30,6 @@ export default function LobbyPage() {
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [guestLoading, setGuestLoading] = useState(false);
   const [pendingRoomId, setPendingRoomId] = useState<string | null>(null);
-  const [showAd, setShowAd] = useState(false);
-  const [adDestination, setAdDestination] = useState<string | null>(null);
 
   useEffect(() => {
     // Initial load
@@ -132,15 +127,7 @@ export default function LobbyPage() {
       setShowAuthGate(true);
       return;
     }
-    // Show interstitial ad before navigating
-    setAdDestination(`/room/${roomId}`);
-    setShowAd(true);
-  };
-
-  const handleAdSkip = () => {
-    if (adDestination) navigate(adDestination);
-    setShowAd(false);
-    setAdDestination(null);
+    navigate(`/room/${roomId}`);
   };
 
   const handleGuestAccess = async () => {
@@ -163,14 +150,6 @@ export default function LobbyPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white font-sans">
-
-      {/* ── Interstitial Ad (before joining a room) ─── */}
-      {showAd && (
-        <AdInterstitial
-          onClose={() => { setShowAd(false); setAdDestination(null); }}
-          onSkip={handleAdSkip}
-        />
-      )}
 
       {/* Auth Gate Modal */}
       {showAuthGate && (
@@ -262,9 +241,6 @@ export default function LobbyPage() {
                 </button>
             ))}
         </div>
-
-        {/* ── Banner Ad ─────────────────────────────────────── */}
-        <AdBanner size="medium" className="mb-8" />
 
         {/* Create Room Modal */}
         {showCreateRoom && (
@@ -389,13 +365,6 @@ export default function LobbyPage() {
                 </div>
               );
 
-              // Insert a native ad card after every 3rd room card (index 2, 5, 8 …)
-              if ((index + 1) % 3 === 0) {
-                return [
-                  card,
-                  <AdNative key={`ad-native-${index}`} />,
-                ];
-              }
               return [card];
             })}
           </div>

@@ -10,7 +10,6 @@ import GameArea from '../components/GameArea';
 import { LogOut, Users, Gamepad2, ArrowLeft } from 'lucide-react';
 import { User, Message, Room, GameType } from '../types';
 import BottomNav from '../components/BottomNav';
-import AdBanner from '../components/AdBanner';
 
 export default function RoomPage() {
   const params = useParams<{ roomId: string }>();
@@ -438,9 +437,6 @@ export default function RoomPage() {
           </div>
         </div>
       </header>
-
-      {/* ── Ad Banner (below header) ─────────────────────────────── */}
-      <AdBanner size="small" className="mx-4 my-1.5 shrink-0" />
 
       {/* ── Room Body ──────────────────────────────────────────── */}
       <div className="flex-1 flex overflow-hidden relative">
